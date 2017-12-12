@@ -8,6 +8,8 @@ Sprite::Sprite(const ltex_t* tex, int hframes, int vframes) {
 	scale = Vec2(1, 1);
 	size = Vec2(0, 0);
 	pivot = Vec2(0,0);
+	topLeft = Vec2(0, 0);
+	radio = (size.x * scale.x) > (size.y * scale.y) ? (size.x * scale.x) / 2 : (size.y * scale.y) / 2;
 	currentFrame = 0;
 	red = 1;
 	blue = 1;
@@ -36,17 +38,24 @@ float Sprite::getAngle() const { return angle; }
 void Sprite::setAngle(float a) { angle = a; }
 
 const Vec2& Sprite::getScale() const { return scale; }
-void Sprite::setScale(const Vec2& s) { scale = s; }
-
+void Sprite::setScale(const Vec2& s) {	scale = s; 
+										radio = (size.x * scale.x) > (size.y * scale.y) ? (size.x * scale.x) / 2 : (size.y * scale.y) / 2;
+										topLeft = Vec2(position.x - (size.x * scale.x * pivot.x), position.y - (size.y * scale.y * pivot.y)); } //Update radio too
 
 // Tamaño de un frame multiplicado por la escala
 Vec2 Sprite::getSize() const { return Vec2(texture->width, texture->height); }
 void Sprite::setSize(const Vec2& s) { size = s; };
 
+const Vec2& Sprite::getTopLeft() const { return topLeft; }
+void Sprite::setTopLeft(const Vec2& t) { topLeft = t; }
+
 // Este valor se pasa a ltex_drawrotsized en el pintado
 // para indicar el pivote de rotación
 const Vec2& Sprite::getPivot() const { return pivot; }
 void Sprite::setPivot(const Vec2& p) { pivot = p; }
+
+void Sprite::setRadio(const float& r) { radio = r; };
+float Sprite::getRadio() { return radio; };
 
 int Sprite::getHframes() const { return horizontalFrames; }
 int Sprite::getVframes() const { return verticalFrames; }
@@ -86,7 +95,9 @@ void Sprite::setCollisionType(CollisionType type) {
 		break;*/
 	case COLLISION_CIRCLE:
 		delete(collider);
-		CircleCollider *col = new CircleCollider(position, (size.x * scale.x) > (size.y * scale.y) ? (size.x * scale.x) /2 : (size.y * scale.y) /2);
+		//CircleCollider *col = new CircleCollider(position, (size.x * scale.x) > (size.y * scale.y) ? (size.x * scale.x) / 2 : (size.y * scale.y) / 2);
+		CircleCollider *col = new CircleCollider(position, radio);
+		//CircleCollider *col = new CircleCollider(position, scale.y);
 		collider = col;
 		colliderType = type;
 		break;

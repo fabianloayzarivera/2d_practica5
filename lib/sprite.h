@@ -26,6 +26,8 @@ private:
 	Vec2 scale;
 	Vec2 size;
 	Vec2 pivot;
+	Vec2 topLeft;
+	float radio;
 	int horizontalFrames;
 	int verticalFrames;
 	int fps;
@@ -62,10 +64,16 @@ public :
 	Vec2 getSize() const;
 	void setSize(const Vec2& s); //added by me
 
+	const Vec2& getTopLeft() const;
+	void setTopLeft(const Vec2& p);
+
 	// Este valor se pasa a ltex_drawrotsized en el pintado
 	// para indicar el pivote de rotación
 	const Vec2& getPivot() const;
 	void setPivot(const Vec2& pivot);
+
+	void setRadio(const float& r);
+	float getRadio();
 
 	int getHframes() const;
 	int getVframes() const;

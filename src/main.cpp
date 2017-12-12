@@ -40,30 +40,18 @@ int main() {
 
 	int widthBall		= 100;
 	int heightBall		= 100;
+	int widthBox		= 100;
+	int heightBox		= 100;
 	int widthCircle		= 16;
 	int heightCircle	= 16;
-
-	Sprite ballSprite	= Sprite(createTexture("./data/ball.png", &widthBall, &heightBall), 1, 1);
-	ballSprite.setPosition(Vec2(0, 0));
-	ballSprite.setBlend(BLEND_ALPHA);
-	ballSprite.setFps(1);
-	ballSprite.setSize(Vec2(widthBall, heightBall));
-	ballSprite.setPivot(Vec2(0.5f, 0.5f));
-
-	Sprite circleSprite = Sprite(createTexture("./data/circle.png", &widthCircle, &heightCircle), 1, 1);
-	circleSprite.setPosition(Vec2(0, 0));
-	circleSprite.setBlend(BLEND_ALPHA);
-	circleSprite.setFps(1);
-	circleSprite.setSize(Vec2(widthCircle, heightCircle));
-	circleSprite.setPivot(Vec2(0.5f, 0.5f));
-	
 	double lastTime = glfwGetTime();
 	double xposMouse = 0;
 	double yposMouse = 0;
 	double xposBall = 0;
 	double yposBall = 0;
-	float angle=0;
-	Vec2 ballPosition;
+	float angle = 0;
+	Vec2 ballPosition = Vec2(0, 0);
+	Vec2 boxPosition = Vec2(0, 0);
 	Vec2 circlePosition;
 	Vec2 mousePos;
 	bool shrinkBall = false;
@@ -72,6 +60,39 @@ int main() {
 	float ballScaleTo = 1.1;
 	float ballScaleStep = 0.25;
 
+	//BALL///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	Sprite ballSprite	= Sprite(createTexture("./data/ball.png", &widthBall, &heightBall), 1, 1);
+	ballSprite.setPosition(Vec2(0, 0));
+	ballSprite.setBlend(BLEND_ALPHA);
+	ballSprite.setFps(1);
+	ballSprite.setSize(Vec2(widthBall, heightBall));
+	ballSprite.setPivot(Vec2(0.5f, 0.5f));
+	ballSprite.setScale(Vec2(1, 1));
+	ballSprite.setCollisionType(COLLISION_CIRCLE);
+	
+	//Mouse Circle///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	Sprite circleSprite = Sprite(createTexture("./data/circle.png", &widthCircle, &heightCircle), 1, 1);
+	circleSprite.setPosition(Vec2(0, 0));
+	circleSprite.setBlend(BLEND_ALPHA);
+	circleSprite.setFps(1);
+	circleSprite.setSize(Vec2(widthCircle, heightCircle));
+	circleSprite.setPivot(Vec2(0.5f, 0.5f));
+	circleSprite.setScale(Vec2(1, 1));
+	circleSprite.setCollisionType(COLLISION_CIRCLE);	
+
+	//BOX///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	Sprite boxSprite = Sprite(createTexture("./data/box.png", &widthBox, &heightBox), 1, 1);
+	boxSprite.setPosition(Vec2(0, 0));
+	boxSprite.setBlend(BLEND_ALPHA);
+	boxSprite.setFps(1);
+	boxSprite.setSize(Vec2(widthBox, heightBox));
+	boxSprite.setPivot(Vec2(0.5f, 0.5f));
+	boxSprite.setScale(Vec2(1, 1));
+	boxSprite.setCollisionType(COLLISION_CIRCLE);
+	
+
+	
+	
 	while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
 		// Actualizamos delta
 		float deltaTime = static_cast<float>(glfwGetTime() - lastTime);
@@ -84,17 +105,18 @@ int main() {
 		lgfx_clearcolorbuffer(0, 0, 0);
 		glfwGetCursorPos(window, &xposMouse, &yposMouse);
 		mousePos = Vec2(xposMouse, yposMouse);
+		circleSprite.setPosition(mousePos);
 
 		ballPosition = Vec2(screenWidth / 4, screenHeight / 2);
 		ballSprite.setPosition(ballPosition);
-		ballSprite.setCollisionType(COLLISION_CIRCLE);
-		scaleBall(ballScale, ballScaleFrom, ballScaleTo, ballScaleStep, deltaTime, shrinkBall);
-		
+		scaleBall(ballScale, ballScaleFrom, ballScaleTo, ballScaleStep, deltaTime, shrinkBall);		
 		ballSprite.setScale(Vec2(ballScale, ballScale));
 
-		circleSprite.setPosition(mousePos);
-		circleSprite.setCollisionType(COLLISION_CIRCLE);
+		boxPosition = Vec2((screenWidth / 4) * 3, screenHeight / 2);
+		boxSprite.setPosition(boxPosition);
 		
+		//cout << "Ball Top Left: " << ballSprite.getTopLeft().x << " , " << ballSprite.getTopLeft().y <<endl;
+
 		if (circleSprite.collides(ballSprite)) {
 			//cout << "Collide!";
 			ballSprite.setColor(1, 0, 0, 1);
@@ -109,14 +131,14 @@ int main() {
 		ballSprite.draw();
 
 		circleSprite.update(deltaTime);
-		circleSprite.draw();
-		
+		circleSprite.draw();	
+
+		boxSprite.update(deltaTime);
+		boxSprite.draw();
 		
 		// Actualizamos ventana y eventos
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-
-
 	}
 
 	return 0;
