@@ -17,6 +17,8 @@ public:
 
 bool checkCircleCircle(const Vec2& pos1, float radius1, const Vec2& pos2, float radius2);
 bool checkCircleRect(const Vec2& circlePos, float circleRadius, const Vec2& rectPos, const Vec2& rectSize);
+bool checkRectRect(const Vec2& rectPos1, const Vec2& rectSize1,	const Vec2& rectPos2, const Vec2& rectSize2);
+
 class CircleCollider : public Collider {
 private:
 	Vec2  *pos;
@@ -34,9 +36,9 @@ private:
 	Vec2 *pos;
 	Vec2 *size;
 public:
-	RectCollider(Vec2& p, Vec2& s) { pos = &p; size = &s; }; // send top left as pos????
+	RectCollider(Vec2& p, Vec2& s) { pos = &p; size = &s; }; 
 	bool collides(const Collider& other) const { return other.collides(*pos, *size); };
-	//bool collides(const Vec2& rectPos, const Vec2& rectSize) const { return checkRectRect(*pos, *size, rectPos, rectSize); };
+	bool collides(const Vec2& rectPos, const Vec2& rectSize) const { return checkRectRect(*pos, *size, rectPos, rectSize); };
 	bool collides(const Vec2& circlePos, float circleRadius) const { return checkCircleRect(circlePos, circleRadius, *pos, *size); };
 	//bool collides(const Vec2& pixelsPos, const Vec2& pixelsSize, const uint8_t* pixels) const ;
 };

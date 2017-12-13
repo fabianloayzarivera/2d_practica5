@@ -18,6 +18,7 @@ using namespace std;
 
 ltex_t *createTexture(const char *filename, int *width, int *height);
 void scaleBall(float &ballScale, const float &from, const float &to, const float &step, const float &deltaTime, bool &shrinkBall);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 int main() {
 
 	// Inicializamos GLFW
@@ -33,6 +34,7 @@ int main() {
 		cout << "Error: No se ha podido crear la ventana" << endl;
 		return -1;
 	}
+	//glfwSetMouseButtonCallback(window, mouse_button_callback);
 	// Activamos contexto de OpenGL
 	glfwMakeContextCurrent(window);
 	// Inicializamos LiteGFX
@@ -44,6 +46,9 @@ int main() {
 	int heightBox		= 100;
 	int widthCircle		= 16;
 	int heightCircle	= 16;
+	int widthRect		= 16;
+	int heightRect		= 16;
+	int mouseButton		= 1;
 	double lastTime = glfwGetTime();
 	double xposMouse = 0;
 	double yposMouse = 0;
@@ -52,13 +57,20 @@ int main() {
 	float angle = 0;
 	Vec2 ballPosition = Vec2(0, 0);
 	Vec2 boxPosition = Vec2(0, 0);
-	Vec2 circlePosition;
 	Vec2 mousePos;
 	bool shrinkBall = false;
+	bool shrinkBox = false;
 	float ballScale = 1;
 	float ballScaleFrom = 0.9;
 	float ballScaleTo = 1.1;
 	float ballScaleStep = 0.25;
+	float boxScale = 1;
+	float boxScaleFrom = 0.9;
+	float boxScaleTo = 1.1;
+	float boxScaleStep = 0.25;
+
+	ltex_t *circleTexture = createTexture("./data/circle.png", &widthCircle, &heightCircle);
+	ltex_t *rectTexture = createTexture("./data/rect.png", &widthRect, &heightRect);
 
 	//BALL///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	Sprite ballSprite	= Sprite(createTexture("./data/ball.png", &widthBall, &heightBall), 1, 1);
@@ -70,15 +82,15 @@ int main() {
 	ballSprite.setScale(Vec2(1, 1));
 	ballSprite.setCollisionType(COLLISION_CIRCLE);
 	
-	//Mouse Circle///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	Sprite circleSprite = Sprite(createTexture("./data/circle.png", &widthCircle, &heightCircle), 1, 1);
-	circleSprite.setPosition(Vec2(0, 0));
-	circleSprite.setBlend(BLEND_ALPHA);
-	circleSprite.setFps(1);
-	circleSprite.setSize(Vec2(widthCircle, heightCircle));
-	circleSprite.setPivot(Vec2(0.5f, 0.5f));
-	circleSprite.setScale(Vec2(1, 1));
-	circleSprite.setCollisionType(COLLISION_CIRCLE);	
+	//Mouse Sprite///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	Sprite mouseSprite = Sprite(circleTexture, 1, 1);
+	mouseSprite.setPosition(Vec2(0, 0));
+	mouseSprite.setBlend(BLEND_ALPHA);
+	mouseSprite.setFps(1);
+	mouseSprite.setSize(Vec2(widthCircle, heightCircle));
+	mouseSprite.setPivot(Vec2(0.5f, 0.5f));
+	mouseSprite.setScale(Vec2(1, 1));
+	mouseSprite.setCollisionType(COLLISION_CIRCLE);	
 
 	//BOX///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	Sprite boxSprite = Sprite(createTexture("./data/box.png", &widthBox, &heightBox), 1, 1);
@@ -88,8 +100,7 @@ int main() {
 	boxSprite.setSize(Vec2(widthBox, heightBox));
 	boxSprite.setPivot(Vec2(0.5f, 0.5f));
 	boxSprite.setScale(Vec2(1, 1));
-	boxSprite.setCollisionType(COLLISION_CIRCLE);
-	
+	boxSprite.setCollisionType(COLLISION_RECT);
 
 	
 	
@@ -105,8 +116,27 @@ int main() {
 		lgfx_clearcolorbuffer(0, 0, 0);
 		glfwGetCursorPos(window, &xposMouse, &yposMouse);
 		mousePos = Vec2(xposMouse, yposMouse);
-		circleSprite.setPosition(mousePos);
-
+		mouseSprite.setPosition(mousePos);
+		mouseSprite.setScale(Vec2(1, 1));
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+			cout << "Left Click!";
+			mouseSprite.setPosition(mousePos);
+			mouseSprite.setTexture(circleTexture);
+			mouseSprite.setSize(Vec2(widthCircle, heightCircle));
+			mouseSprite.setCollisionType(COLLISION_CIRCLE);
+			mouseSprite.setScale(Vec2(1, 1));
+		}
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+			cout << "Right Click!";
+			mouseSprite.setPosition(mousePos);
+			mouseSprite.setTexture(rectTexture);
+			mouseSprite.setSize(Vec2(widthRect, heightRect));
+			mouseSprite.setCollisionType(COLLISION_RECT);
+			mouseSprite.setScale(Vec2(1, 1));
+		}
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
+			cout << "Middle Click!";
+		}
 		ballPosition = Vec2(screenWidth / 4, screenHeight / 2);
 		ballSprite.setPosition(ballPosition);
 		scaleBall(ballScale, ballScaleFrom, ballScaleTo, ballScaleStep, deltaTime, shrinkBall);		
@@ -114,28 +144,42 @@ int main() {
 
 		boxPosition = Vec2((screenWidth / 4) * 3, screenHeight / 2);
 		boxSprite.setPosition(boxPosition);
+		scaleBall(boxScale, boxScaleFrom, boxScaleTo, boxScaleStep, deltaTime, shrinkBox);
+		boxSprite.setScale(Vec2(boxScale, boxScale));
 		
 		//cout << "Ball Top Left: " << ballSprite.getTopLeft().x << " , " << ballSprite.getTopLeft().y <<endl;
 
-		if (circleSprite.collides(ballSprite)) {
+		if (mouseSprite.collides(ballSprite)) {
 			//cout << "Collide!";
 			ballSprite.setColor(1, 0, 0, 1);
-			circleSprite.setColor(1, 0, 0, 1);
+			mouseSprite.setColor(1, 0, 0, 1);
+		}
+		else if (mouseSprite.collides(boxSprite)) {
+			boxSprite.setColor(1, 0, 0, 1);
+			mouseSprite.setColor(1, 0, 0, 1);
 		}
 		else {
 			ballSprite.setColor(1, 1, 1, 1);
-			circleSprite.setColor(1, 1, 1, 1);
+			boxSprite.setColor(1, 1, 1, 1);
+			mouseSprite.setColor(1, 1, 1, 1);
 		}
+
 
 		ballSprite.update(deltaTime);
 		ballSprite.draw();
 
-		circleSprite.update(deltaTime);
-		circleSprite.draw();	
-
 		boxSprite.update(deltaTime);
 		boxSprite.draw();
-		
+
+		mouseSprite.update(deltaTime);
+		mouseSprite.draw();	
+
+		//cout << "Box Top Left: " << boxSprite.getTopLeft().x << " , " << boxSprite.getTopLeft().y << "Box Pos: " << boxSprite.getPosition().x << " , " << boxSprite.getPosition().y << endl;
+		//lgfx_drawrect(boxSprite.getTopLeft().x, boxSprite.getTopLeft().y, boxSprite.getScaledSize().x, boxSprite.getScaledSize().y);
+		lgfx_setcolor(0, 1, 0, 0.5f);
+		lgfx_drawrect(mouseSprite.getTopLeft().x, mouseSprite.getTopLeft().y, mouseSprite.getScaledSize().x, mouseSprite.getScaledSize().y);
+		lgfx_drawrect(boxSprite.getTopLeft().x, boxSprite.getTopLeft().y, boxSprite.getScaledSize().x, boxSprite.getScaledSize().y);
+		mouseSprite.setColor(1, 1, 1, 1);
 		// Actualizamos ventana y eventos
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -183,3 +227,17 @@ void scaleBall(float &ballScale, const float &from, const float &to, const float
 	}
 
 }
+
+//void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+//{
+//	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+//		cout << "Right click!";
+//		
+//	}
+//	else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+//		cout << "Left click!";
+//	}
+//	else if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
+//		cout << "Middle click!";
+//	}
+//}

@@ -40,7 +40,9 @@ void Sprite::setAngle(float a) { angle = a; }
 const Vec2& Sprite::getScale() const { return scale; }
 void Sprite::setScale(const Vec2& s) {	scale = s; 
 										radio = (size.x * scale.x) > (size.y * scale.y) ? (size.x * scale.x) / 2 : (size.y * scale.y) / 2;
-										topLeft = Vec2(position.x - (size.x * scale.x * pivot.x), position.y - (size.y * scale.y * pivot.y)); } //Update radio too
+										topLeft = Vec2(position.x - (size.x * scale.x * pivot.x), position.y - (size.y * scale.y * pivot.y)); 
+										scaledSize = Vec2(size.x * scale.x, size.y * scale.y);
+									 } //Update radio too
 
 // Tamaño de un frame multiplicado por la escala
 Vec2 Sprite::getSize() const { return Vec2(texture->width, texture->height); }
@@ -48,6 +50,9 @@ void Sprite::setSize(const Vec2& s) { size = s; };
 
 const Vec2& Sprite::getTopLeft() const { return topLeft; }
 void Sprite::setTopLeft(const Vec2& t) { topLeft = t; }
+
+const Vec2& Sprite::getScaledSize() const { return scaledSize; }
+void Sprite::setScaledSize(const Vec2& t) { scaledSize = t; }
 
 // Este valor se pasa a ltex_drawrotsized en el pintado
 // para indicar el pivote de rotación
@@ -89,25 +94,34 @@ void Sprite::draw() const {
 }
 
 void Sprite::setCollisionType(CollisionType type) {
-	switch (type)
-	{
+
+	if (type == COLLISION_CIRCLE) {
+		delete(collider);
+		CircleCollider *colCirc = new CircleCollider(position, radio);
+		collider = colCirc;
+		colliderType = type;
+	}
+	if (type == COLLISION_RECT) {
+		delete(collider);
+		RectCollider *colRect = new RectCollider(topLeft, scaledSize);
+		collider = colRect;
+		colliderType = type;
+	}
+	/*switch (type)
+	{*/
 	/*case COLLISION_NONE:
 		break;*/
-	case COLLISION_CIRCLE:
-		delete(collider);
-		//CircleCollider *col = new CircleCollider(position, (size.x * scale.x) > (size.y * scale.y) ? (size.x * scale.x) / 2 : (size.y * scale.y) / 2);
-		CircleCollider *col = new CircleCollider(position, radio);
-		//CircleCollider *col = new CircleCollider(position, scale.y);
-		collider = col;
-		colliderType = type;
+	/*case COLLISION_CIRCLE:
+		
 		break;
-	/*case COLLISION_RECT:
-		break;
-	case COLLISION_PIXELS:
+	case COLLISION_RECT:
+		
+		break;*/
+	/*case COLLISION_PIXELS:
 		break;*/
 	/*default:
 		break;*/
-	}
+	/*}*/
 };
 
 CollisionType    Sprite::getCollisionType() const { return colliderType; };
