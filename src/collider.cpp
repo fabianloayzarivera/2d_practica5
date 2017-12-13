@@ -44,12 +44,15 @@ bool checkRectRect(const Vec2& rectPos1, const Vec2& rectSize1, const Vec2& rect
 
 bool checkPixelsPixels(const Vec2& pixelsPos1, const Vec2& pixelsSize1, const uint8_t* pixels1, const Vec2& pixelsPos2, const Vec2& pixelsSize2, const uint8_t* pixels2) {
 
-	for (int i = 0; i < (pixelsSize1.y * 4); i++) {
-		for (int j = 0; j < (pixelsSize1.x * 4); j = j++) {
-			if (pixels1[i] >= 128 && pixels2[j] >= 128) {
+	for (int i = 0; i < (pixelsSize1.y); i++) {
+		for (int j = 0; j < (pixelsSize1.x); j = j++) {
+			if (pixels1[((i* static_cast<int>(pixelsSize1.x)) + j)*4 +3] >= 128 
+			&& pixels2[((i* static_cast<int>(pixelsSize1.x)) + j) * 4 + 3] >= 128) {
 				
+				return true; //not sure yet about this function
 			}
 		}
 	}
+	return false;
 	
 }
