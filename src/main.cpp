@@ -44,6 +44,8 @@ int main() {
 	int heightBall		= 100;
 	int widthBox		= 100;
 	int heightBox		= 100;
+	int widthBee		= 80;
+	int heightBee		= 92;
 	int widthCircle		= 16;
 	int heightCircle	= 16;
 	int widthRect		= 16;
@@ -57,6 +59,7 @@ int main() {
 	float angle = 0;
 	Vec2 ballPosition = Vec2(0, 0);
 	Vec2 boxPosition = Vec2(0, 0);
+	Vec2 beePosition = Vec2(0, 0);
 	Vec2 mousePos;
 	bool shrinkBall = false;
 	bool shrinkBox = false;
@@ -71,6 +74,7 @@ int main() {
 
 	ltex_t *circleTexture = createTexture("./data/circle.png", &widthCircle, &heightCircle);
 	ltex_t *rectTexture = createTexture("./data/rect.png", &widthRect, &heightRect);
+	ltex_t *beeTexture = createTexture("./data/bee.png", &widthBee, &heightBee);
 
 	//BALL///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	Sprite ballSprite	= Sprite(createTexture("./data/ball.png", &widthBall, &heightBall), 1, 1);
@@ -102,6 +106,15 @@ int main() {
 	boxSprite.setScale(Vec2(1, 1));
 	boxSprite.setCollisionType(COLLISION_RECT);
 
+	//BEE///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	Sprite beeSprite = Sprite(beeTexture, 1, 1);
+	beeSprite.setPosition(Vec2(0, 0));
+	beeSprite.setBlend(BLEND_ALPHA);
+	beeSprite.setFps(1);
+	beeSprite.setSize(Vec2(widthBee, heightBee));
+	beeSprite.setPivot(Vec2(0.5f, 0.5f));
+	beeSprite.setScale(Vec2(1, 1));
+	beeSprite.setCollisionType(COLLISION_PIXELS);
 	
 	
 	while (!glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE)) {
@@ -119,7 +132,7 @@ int main() {
 		mouseSprite.setPosition(mousePos);
 		mouseSprite.setScale(Vec2(1, 1));
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-			cout << "Left Click!";
+			//cout << "Left Click!";
 			mouseSprite.setPosition(mousePos);
 			mouseSprite.setTexture(circleTexture);
 			mouseSprite.setSize(Vec2(widthCircle, heightCircle));
@@ -127,7 +140,7 @@ int main() {
 			mouseSprite.setScale(Vec2(1, 1));
 		}
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-			cout << "Right Click!";
+			//cout << "Right Click!";
 			mouseSprite.setPosition(mousePos);
 			mouseSprite.setTexture(rectTexture);
 			mouseSprite.setSize(Vec2(widthRect, heightRect));
@@ -135,7 +148,7 @@ int main() {
 			mouseSprite.setScale(Vec2(1, 1));
 		}
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-			cout << "Middle Click!";
+			//cout << "Middle Click!";
 		}
 		ballPosition = Vec2(screenWidth / 4, screenHeight / 2);
 		ballSprite.setPosition(ballPosition);
@@ -146,6 +159,10 @@ int main() {
 		boxSprite.setPosition(boxPosition);
 		scaleBall(boxScale, boxScaleFrom, boxScaleTo, boxScaleStep, deltaTime, shrinkBox);
 		boxSprite.setScale(Vec2(boxScale, boxScale));
+
+		beePosition = Vec2((screenWidth / 4) * 2, screenHeight / 2);
+		beeSprite.setPosition(beePosition);
+		
 		
 		//cout << "Ball Top Left: " << ballSprite.getTopLeft().x << " , " << ballSprite.getTopLeft().y <<endl;
 
@@ -171,15 +188,22 @@ int main() {
 		boxSprite.update(deltaTime);
 		boxSprite.draw();
 
+		beeSprite.update(deltaTime);
+		beeSprite.draw();
+
 		mouseSprite.update(deltaTime);
 		mouseSprite.draw();	
 
+		
+
 		//cout << "Box Top Left: " << boxSprite.getTopLeft().x << " , " << boxSprite.getTopLeft().y << "Box Pos: " << boxSprite.getPosition().x << " , " << boxSprite.getPosition().y << endl;
 		//lgfx_drawrect(boxSprite.getTopLeft().x, boxSprite.getTopLeft().y, boxSprite.getScaledSize().x, boxSprite.getScaledSize().y);
-		lgfx_setcolor(0, 1, 0, 0.5f);
+		/*lgfx_setcolor(0, 1, 0, 0.5f);
 		lgfx_drawrect(mouseSprite.getTopLeft().x, mouseSprite.getTopLeft().y, mouseSprite.getScaledSize().x, mouseSprite.getScaledSize().y);
 		lgfx_drawrect(boxSprite.getTopLeft().x, boxSprite.getTopLeft().y, boxSprite.getScaledSize().x, boxSprite.getScaledSize().y);
-		mouseSprite.setColor(1, 1, 1, 1);
+		mouseSprite.setColor(1, 1, 1, 1);*/
+		
+
 		// Actualizamos ventana y eventos
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -228,16 +252,4 @@ void scaleBall(float &ballScale, const float &from, const float &to, const float
 
 }
 
-//void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-//{
-//	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-//		cout << "Right click!";
-//		
-//	}
-//	else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-//		cout << "Left click!";
-//	}
-//	else if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
-//		cout << "Middle click!";
-//	}
-//}
+

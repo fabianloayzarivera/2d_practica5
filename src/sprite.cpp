@@ -95,6 +95,9 @@ void Sprite::draw() const {
 
 void Sprite::setCollisionType(CollisionType type) {
 
+	if (type == COLLISION_NONE) {
+		delete(collider);
+	}
 	if (type == COLLISION_CIRCLE) {
 		delete(collider);
 		CircleCollider *colCirc = new CircleCollider(position, radio);
@@ -107,21 +110,17 @@ void Sprite::setCollisionType(CollisionType type) {
 		collider = colRect;
 		colliderType = type;
 	}
-	/*switch (type)
-	{*/
-	/*case COLLISION_NONE:
-		break;*/
-	/*case COLLISION_CIRCLE:
-		
-		break;
-	case COLLISION_RECT:
-		
-		break;*/
-	/*case COLLISION_PIXELS:
-		break;*/
-	/*default:
-		break;*/
-	/*}*/
+	if (type == COLLISION_PIXELS) {
+		delete(collider);
+		std::vector<unsigned char> pixels(texture->width * texture->height * 4);
+		ltex_getpixels(texture, pixels.data());
+		int cont = 0;
+		uint8_t* pix = pixels.data();
+		PixelsCollider *colPix = new PixelsCollider(topLeft, scaledSize, pix);
+		collider = colPix;
+		colliderType = type;
+	}
+
 };
 
 CollisionType    Sprite::getCollisionType() const { return colliderType; };

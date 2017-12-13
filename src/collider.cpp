@@ -26,11 +26,30 @@ bool checkCircleRect(const Vec2& circlePos, float circleRadius, const Vec2& rect
 }
 
 bool checkRectRect(const Vec2& rectPos1, const Vec2& rectSize1, const Vec2& rectPos2, const Vec2& rectSize2) { //box then mouse
-	
-	if (((rectPos2.x < (rectPos1.x + rectSize1.x)) && (rectPos2.x > rectPos1.x)) && ((rectPos2.y > rectPos1.y) && (rectPos2.y < (rectPos1.y + rectSize1.y)))) {
+	float xPrim2 = rectPos2.x + rectSize2.x;
+	float yPrim2 = rectPos2.y + rectSize2.y;
+	float xPrim1 = rectPos1.x + rectSize1.x;
+	float yPrim1 = rectPos1.y + rectSize1.y;
+	float x1 = rectPos1.x;
+	float y1 = rectPos1.y;
+	float x2 = rectPos2.x;
+	float y2 = rectPos2.y;
+
+	if (((x2 < xPrim1)&&((x2 > x1)||(xPrim2 > x1)))&&((y2 < yPrim1)&&((y2 > y1)||(yPrim2 > y1)))) 
 		return true;
-	}
-	else {
+	else 
 		return false;
+	
+}
+
+bool checkPixelsPixels(const Vec2& pixelsPos1, const Vec2& pixelsSize1, const uint8_t* pixels1, const Vec2& pixelsPos2, const Vec2& pixelsSize2, const uint8_t* pixels2) {
+
+	for (int i = 0; i < (pixelsSize1.y * 4); i++) {
+		for (int j = 0; j < (pixelsSize1.x * 4); j = j++) {
+			if (pixels1[i] >= 128 && pixels2[j] >= 128) {
+				
+			}
+		}
 	}
+	
 }
