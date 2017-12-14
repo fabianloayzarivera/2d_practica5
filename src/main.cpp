@@ -17,8 +17,8 @@
 using namespace std;
 
 ltex_t *createTexture(const char *filename, int *width, int *height);
-void scaleBall(float &ballScale, const float &from, const float &to, const float &step, const float &deltaTime, bool &shrinkBall);
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+void scale(float &spriteScale, const float &from, const float &to, const float &step, const float &deltaTime, bool &shrink);
+
 int main() {
 
 	// Inicializamos GLFW
@@ -71,6 +71,7 @@ int main() {
 	float boxScaleFrom = 0.9;
 	float boxScaleTo = 1.1;
 	float boxScaleStep = 0.25;
+	float beeScale = 1;
 
 	ltex_t *circleTexture = createTexture("./data/circle.png", &widthCircle, &heightCircle);
 	ltex_t *rectTexture = createTexture("./data/rect.png", &widthRect, &heightRect);
@@ -149,22 +150,26 @@ int main() {
 		}
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
 			//cout << "Middle Click!";
+			mouseSprite.setPosition(mousePos);
+			mouseSprite.setTexture(beeTexture);
+			mouseSprite.setSize(Vec2(widthBee, heightBee));
+			mouseSprite.setCollisionType(COLLISION_PIXELS);
+			mouseSprite.setScale(Vec2(1, 1));
 		}
 		ballPosition = Vec2(screenWidth / 4, screenHeight / 2);
 		ballSprite.setPosition(ballPosition);
-		scaleBall(ballScale, ballScaleFrom, ballScaleTo, ballScaleStep, deltaTime, shrinkBall);		
+		scale(ballScale, ballScaleFrom, ballScaleTo, ballScaleStep, deltaTime, shrinkBall);		
 		ballSprite.setScale(Vec2(ballScale, ballScale));
 
 		boxPosition = Vec2((screenWidth / 4) * 3, screenHeight / 2);
 		boxSprite.setPosition(boxPosition);
-		scaleBall(boxScale, boxScaleFrom, boxScaleTo, boxScaleStep, deltaTime, shrinkBox);
+		scale(boxScale, boxScaleFrom, boxScaleTo, boxScaleStep, deltaTime, shrinkBox);
 		boxSprite.setScale(Vec2(boxScale, boxScale));
 
 		beePosition = Vec2((screenWidth / 4) * 2, screenHeight / 2);
 		beeSprite.setPosition(beePosition);
-		
-		
-		//cout << "Ball Top Left: " << ballSprite.getTopLeft().x << " , " << ballSprite.getTopLeft().y <<endl;
+		beeSprite.setScale(Vec2(beeScale, beeScale));
+
 
 		if (mouseSprite.collides(ballSprite)) {
 			//cout << "Collide!";
@@ -175,9 +180,14 @@ int main() {
 			boxSprite.setColor(1, 0, 0, 1);
 			mouseSprite.setColor(1, 0, 0, 1);
 		}
+		else if (mouseSprite.collides(beeSprite)) {
+			beeSprite.setColor(1, 0, 0, 1);
+			mouseSprite.setColor(1, 0, 0, 1);
+		}
 		else {
 			ballSprite.setColor(1, 1, 1, 1);
 			boxSprite.setColor(1, 1, 1, 1);
+			beeSprite.setColor(1, 1, 1, 1);
 			mouseSprite.setColor(1, 1, 1, 1);
 		}
 
@@ -195,14 +205,14 @@ int main() {
 		mouseSprite.draw();	
 
 		
-
-		//cout << "Box Top Left: " << boxSprite.getTopLeft().x << " , " << boxSprite.getTopLeft().y << "Box Pos: " << boxSprite.getPosition().x << " , " << boxSprite.getPosition().y << endl;
-		//lgfx_drawrect(boxSprite.getTopLeft().x, boxSprite.getTopLeft().y, boxSprite.getScaledSize().x, boxSprite.getScaledSize().y);
+		//Uncomment To see colliders
+		
+	
 		/*lgfx_setcolor(0, 1, 0, 0.5f);
 		lgfx_drawrect(mouseSprite.getTopLeft().x, mouseSprite.getTopLeft().y, mouseSprite.getScaledSize().x, mouseSprite.getScaledSize().y);
-		lgfx_drawrect(boxSprite.getTopLeft().x, boxSprite.getTopLeft().y, boxSprite.getScaledSize().x, boxSprite.getScaledSize().y);
-		mouseSprite.setColor(1, 1, 1, 1);*/
-		
+		lgfx_drawrect(beeSprite.getTopLeft().x, beeSprite.getTopLeft().y, beeSprite.getScaledSize().x, beeSprite.getScaledSize().y);
+		mouseSprite.setColor(1, 1, 1, 1);
+		*/
 
 		// Actualizamos ventana y eventos
 		glfwSwapBuffers(window);
@@ -233,19 +243,19 @@ ltex_t* createTexture(const char *filename, int *width, int *height) {
 
 }
 
-void scaleBall(float &ballScale, const float &from, const float &to, const float &step, const float &deltaTime, bool &shrinkBall) { //Make general 
-	if (shrinkBall) {
-		ballScale -= step * deltaTime;
-		if (ballScale <= from) {
-			ballScale = from;
-			shrinkBall = false;
+void scale(float &spriteScale, const float &from, const float &to, const float &step, const float &deltaTime, bool &shrink) { //Make general 
+	if (shrink) {
+		spriteScale -= step * deltaTime;
+		if (spriteScale <= from) {
+			spriteScale = from;
+			shrink = false;
 		}
 	}
 	else {
-		ballScale += step * deltaTime;
-		if (ballScale >= to) {
-			ballScale = to;
-			shrinkBall = true;
+		spriteScale += step * deltaTime;
+		if (spriteScale >= to) {
+			spriteScale = to;
+			shrink = true;
 		}
 
 	}

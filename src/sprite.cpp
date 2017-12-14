@@ -42,7 +42,7 @@ void Sprite::setScale(const Vec2& s) {	scale = s;
 										radio = (size.x * scale.x) > (size.y * scale.y) ? (size.x * scale.x) / 2 : (size.y * scale.y) / 2;
 										topLeft = Vec2(position.x - (size.x * scale.x * pivot.x), position.y - (size.y * scale.y * pivot.y)); 
 										scaledSize = Vec2(size.x * scale.x, size.y * scale.y);
-									 } //Update radio too
+									 } //Update radio and topleft too
 
 // Tamaño de un frame multiplicado por la escala
 Vec2 Sprite::getSize() const { return Vec2(texture->width, texture->height); }
@@ -114,9 +114,8 @@ void Sprite::setCollisionType(CollisionType type) {
 		delete(collider);
 		std::vector<unsigned char> pixels(texture->width * texture->height * 4);
 		ltex_getpixels(texture, pixels.data());
-		int cont = 0;
-		uint8_t* pix = pixels.data();
-		PixelsCollider *colPix = new PixelsCollider(topLeft, scaledSize, pix);
+		//uint8_t* pix = pixels.data();
+		PixelsCollider *colPix = new PixelsCollider(topLeft, scaledSize, pixels);
 		collider = colPix;
 		colliderType = type;
 	}
